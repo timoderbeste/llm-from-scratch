@@ -14,7 +14,12 @@ class GPT2Model(nn.Module):
         self.drop_emb = nn.Dropout(config['dropout'])
 
         self.transformer_blocks = nn.Sequential(
-            *[TransformerBlock(config['emb_dim'], config['emb_dim'], config['num_heads']) for _ in
+            *[TransformerBlock(
+                config['emb_dim'],
+                config['emb_dim'],
+                config['num_heads'],
+                config['dropout']
+            ) for _ in
               range(config['num_layers'])],
         )
         self.final_norm = LayerNormalization(config['emb_dim'])

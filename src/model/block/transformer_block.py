@@ -2,6 +2,7 @@ from torch import nn
 
 from src.model.attention.multi_head_attention import MultiHeadAttention
 from src.model.layer.feed_forward_equal import FeedForwardEqual
+from src.model.layer.layer_normalization import LayerNormalization
 
 
 class TransformerBlock(nn.Module):
@@ -27,21 +28,21 @@ class TransformerBlock(nn.Module):
             qkv_bias=qkv_bias,
         )
         self.ff = FeedForwardEqual(emb_dim, hidden_size)
-        self.norm1 = nn.LayerNorm(emb_dim)
-        self.norm2 = nn.LayerNorm(emb_dim)
-        self.drop_shortcut = nn.Dropout(dropout)
+        self.norm1 = LayerNormalization(emb_dim)
+        self.norm2 = LayerNormalization(emb_dim)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         shortcut = x
         x = self.norm1(x)
         x = self.attn(x)
-        x = self.drop_shortcut(x)
+        x = self.dropout(x)
         x = x + shortcut
 
         shortcut = x
         x = self.norm2(x)
         x = self.ff(x)
-        x = self.drop_shortcut(x)
+        x = self.dropout(x)
         x = x + shortcut
 
         return x
